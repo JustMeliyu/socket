@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>index1</title>
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+
+        $(document).ready(function () {
+<!--            var socket = io.connect("http://172.16.1.131:5003/test");-->
+            var socket = io.connect("http://172.16.1.131:5005/test");
+<!--            var socket = io.connect("http://172.16.1.131:5006/test");-->
+<!--            var socket = io.connect("http://tms.yoohoor.com:5002/alarms");-->
+
+            socket.on('connect', function() {
+<!--                {#socket.emit('my_event', {data: 'I\'m connected!'});#}-->
+                console.log("join success")
+<!--                console.log(socket)-->
+                socket.emit('join', {room: '2200'});
+                console.log("connect_event success")
+            });
+
+            socket.on('my_response', function(msg, cb) {
+                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data).html());
+                console.log("accept success!")
+                if (cb)
+                    cb();
+            });
+
+            socket.on('alarms', function (msg, cb) {
+                console.log("-----------")
+
+            });
+
+<!--            socket.on('connect', function () {-->
+<!--                socket.emit("join", {code: "100000"})   // 加入房间-->
+<!--                console.log("join success")-->
+<!--                socket.emit('connect_event', {data: 'client,connected!'});      //客户端向服务端发起请求链接-->
+<!--                console.log("connect_event success")-->
+<!--                socket.emit('client_event', {data: 'client,event!'});-->
+<!--            });-->
+
+
+
+            socket.on('join_room', function (msg, ack) {
+                console.log(msg)
+<!--                {#$('#log').append('<br>' + $('<div/>').text('Received #' + ': ' + msg.data).html()); //将服务端发过来的信息，显示在页面上#}-->
+                ack('client received');    //响应服务端的回调函数，告知服务端，客户端已收到消息
+                console.log("====================")
+
+            });
+
+            socket.on('server_response', function (msg, ack) {
+                console.log(msg)
+<!--                {#$('#log').append('<br>' + $('<div/>').text('Received #' + ': ' + msg.data).html()); //将服务端发过来的信息，显示在页面上#}-->
+                ack('client received');    //响应服务端的回调函数，告知服务端，客户端已收到消息
+
+            });
+
+             socket.on('server_response1', function (msg) {
+                $('#log').append('<br>' + $('<div/>').text('Received #' + ': ' + msg.data).html()); //将服务端发过来的信息，显示在页面上
+                // ack('msg');    //响应服务端的回调函数，告知服务端，客户端已收到消息
+
+            });
+
+            $('#aa').click(function (event) {
+                socket.emit('client_event', {data: $('#emit_data').val()}, function (data) {
+                    console.log("server received data", data);  // 此处data为服务端发送过来的回调参数，说明服务端已收到客户端的消息；
+
+                });
+            });
+
+
+        });
+
+    </script>
+
+</head>
+<body>
+<h2>WebSokect</h2>
+<form id="emit" method="POST" action='#'>
+    <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+    <input type="button" value="Echo" id="aa">
+</form>
+<div id='log'></div>
+</body>
+</html>
